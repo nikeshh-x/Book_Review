@@ -6,6 +6,7 @@ import Navbar from "./components/Navbar";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import AddBookPage from "./pages/AddBookPage";
 
 const App = () => {
   const ProtectedRoute = ({ children }) => {
@@ -39,6 +40,7 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+            <Route path="/books/add" element={<AddBookPage />} />
           </Routes>
         </div>
       </AuthProvider>

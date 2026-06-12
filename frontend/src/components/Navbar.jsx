@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
-  const {user, logout, isAuthenticated } = useAuth();
+  const { user, logout, isAuthenticated } = useAuth();
 
   return (
     <nav className="bg-blue-600 text-white shadow-lg">
@@ -13,12 +13,17 @@ const Navbar = () => {
             BookReviews
           </Link>
           <div className="space-x-4">
-            <Link to={"/books/"} className="hover:text-blue-200">
-              Books
-            </Link>
+            {user?.is_staff && (
+              <Link
+                to="/books/add"
+                className="bg-green-500 px-3 py-1 rounded hover:bg-green-600"
+              >
+                Add Book
+              </Link>
+            )}
             {isAuthenticated ? (
               <>
-                <span className="text-blue-200">Hi, {user?.username }</span>
+                <span className="text-blue-200">Hi, {user?.username}</span>
                 <button
                   onClick={logout}
                   className="bg-red-500 px-3 py-1 rounded hover:bg-red-600"

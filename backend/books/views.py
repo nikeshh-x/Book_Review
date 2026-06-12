@@ -29,6 +29,12 @@ class BookViewSet(viewsets.ModelViewSet):
     serializer_class = BookSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
+    def perform_create(self, serializer):
+        if self.request.user.is_staff:
+            serializer.save()
+        else:
+            return Response({'error': 'Only staff can add books'}, status=403)
+
     @action(detail=True, methods=['POST'])
     def rate_book(self, request, pk=None):
         book = self.get_object()
@@ -55,17 +61,18 @@ class BookViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['PUT'], permission_classes=[permissions.IsAuthenticated])
     def edit_review(self, request, pk=None):
+        book = self.get_object()
         review_id = request.data.get('review_id')
+        
         try:
-            review = Review.objects.get(id=review_id, user=request.user)
+            review = Review.objects.get(id=review_id, user=request.user, book=book)
+            serializer = ReviewSerializer(review, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=400)
         except Review.DoesNotExist:
             return Response({'error': 'Review not found'}, status=404)
-
-        serializer = ReviewSerializer(review, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=400)
 
     @action(detail=True, methods=['DELETE'], permission_classes=[permissions.IsAuthenticated])
     def delete_review(self, request, pk=None):

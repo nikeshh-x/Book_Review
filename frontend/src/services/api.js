@@ -17,9 +17,19 @@ api.interceptors.request.use((config) => {
 
 export const fetchBooks = () => api.get("/books/");
 export const fetchBook = (id) => api.get(`/books/${id}/`);
-export const rateBook = (id, score) => api.post(`/books/${id}/rate_book/`, { score });
-export const addReview = (id, review) => api.post(`/books/${id}/add_review/`, review);
-export const editReview = (bookId, reviewId, reviewData) => api.put(`/books/${id}/edit_review/`, { review_id: reviewId, ...review });
-export const deleteReview = (bookId, reviewId) => api.delete(`/books/${id}/delete_review/`, { data: { review_id: reviewId } });
+export const rateBook = (id, score) =>
+  api.post(`/books/${id}/rate_book/`, { score });
+export const addReview = (id, review) =>
+  api.post(`/books/${id}/add_review/`, review);
+export const editReview = (bookId, reviewId, reviewData) =>
+  api.put(`/books/${bookId}/edit_review/`, {
+    review_id: reviewId,
+    title: reviewData.title,
+    comment: reviewData.comment,
+  });
+export const deleteReview = (bookId, reviewId) =>
+  api.delete(`/books/${bookId}/delete_review/`, {
+    data: { review_id: reviewId },
+  });
 
 export default api;

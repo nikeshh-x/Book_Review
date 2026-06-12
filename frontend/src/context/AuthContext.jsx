@@ -53,6 +53,7 @@ export function AuthProvider({ children }) {
     const userRes = await api.get("/me/");
     setIsAuthenticated(true);
     setUser(userRes.data);
+    console.log(user)
   };
 
   const register = async (username,email, password, password2) => {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { addReview, fetchBook, rateBook } from "../services/api";
+import { addReview, deleteReview, fetchBook, rateBook } from "../services/api";
 
 const BookPage = () => {
   const { id } = useParams();
@@ -10,6 +10,7 @@ const BookPage = () => {
   const [rating, setRating] = useState(0);
   const [reviewTitle, setReviewTitle] = useState("");
   const [reviewComment, setReviewComment] = useState("");
+  const [editingReview, setEditingReview] = useState(null);
   const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
@@ -61,6 +62,29 @@ const BookPage = () => {
     }
   };
 
+  const handleEdit = (review) => {
+    setEditingReview(review);
+    setReviewTitle(review.title);
+    setReviewComment(review.comment);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleDelete = async (reviewId) => {
+    if (!confirm("Are you sure you want to delete this review ?")) return;
+    try {
+      await deleteReview(id, reviewId);
+      loadBook();
+    } catch (error) {
+      console.error(("Failed to delete review", error));
+    }
+  };
+
+  const cancelEdit = () => {
+    setEditingReview(null);
+    setReviewTitle("");
+    setReviewComment("");
+  };
+
   if (loading) return <div className="text-center py-10">Loading...</div>;
   if (!book) return <div className="text-center py-10">Book not found</div>;
 
@@ -70,6 +94,7 @@ const BookPage = () => {
         <span className="text-3xl">←</span> Back to Books
       </Link>
       <div className="bg-white rounded-lg shadow-md p-6 mt-4">
+        
         <h1 className="text-3xl font-bold mb-2">{book.title}</h1>
         <p className="text-gray-600 mb-4">{book.author}</p>
 
@@ -126,8 +151,17 @@ const BookPage = () => {
                 type="submit"
                 className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
               >
-                Submit Review
+                {editingReview ? "Update Review" : "Submit Review"}
               </button>
+              {editingReview && (
+                <button
+                  type="button"
+                  onClick={cancelEdit}
+                  className="bg-gray-400 ml-2 text-white px-4 py-2 rounded hover:bg-gray-500"
+                >
+                  Cancel
+                </button>
+              )}
             </form>
           ) : (
             <p className="text-gray-500">
